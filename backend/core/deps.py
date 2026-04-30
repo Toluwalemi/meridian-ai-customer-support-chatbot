@@ -6,6 +6,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
 
+from core.logging import logger
 from core.settings import settings
 
 
@@ -76,12 +77,24 @@ _verifier = ClerkJwtVerifier(
     audience=settings.clerk_audience,
 )
 
-_bearer = HTTPBearer(auto_error=True)
+_dev_bypass_active = settings.env == "dev" and settings.auth_dev_bypass
+_bearer = HTTPBearer(auto_error=not _dev_bypass_active)
+
+if _dev_bypass_active:
+    logger.warning("auth.dev_bypass_enabled", env=settings.env)
 
 
 async def get_current_user(
-    credentials: Annotated[HTTPAuthorizationCredentials, Depends(_bearer)],
+    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(_bearer)] = None,
 ) -> AuthenticatedUser:
+    if _dev_bypass_active and credentials is None:
+        return AuthenticatedUser(sub="dev-user", email="dev@local", raw_claims={})
+    if credentials is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Missing bearer token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     return await _verifier.verify(credentials.credentials)
 
 

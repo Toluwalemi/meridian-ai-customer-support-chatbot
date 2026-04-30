@@ -29,6 +29,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
 
 def create_app() -> FastAPI:
+    """Configures structured JSON logging, sets up CORS"""
     app = FastAPI(title=settings.app_name, debug=settings.debug, lifespan=lifespan)
 
     app.state.limiter = chat_limiter
@@ -39,8 +40,8 @@ def create_app() -> FastAPI:
         CORSMiddleware,
         allow_origins=settings.cors_origins,
         allow_credentials=True,
-        allow_methods=["GET", "POST", "OPTIONS"],
-        allow_headers=["Authorization", "Content-Type"],
+        allow_methods=["*"],
+        allow_headers=["*"],
     )
 
     register_exception_handlers(app)

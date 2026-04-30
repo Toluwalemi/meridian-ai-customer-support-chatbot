@@ -8,25 +8,16 @@ from core.deps import CurrentUser
 from core.settings import settings
 
 limiter = Limiter(key_func=get_remote_address)
+router = APIRouter(prefix="/chat", tags=["chat"])
 
 
-class ChatViews:
-    def __init__(self) -> None:
-        self.router = APIRouter(prefix="/chat", tags=["chat"])
-        self.router.add_api_route(
-            "",
-            self.send,
-            methods=["POST"],
-            response_model=ChatResponse,
-        )
-
-    @limiter.limit(settings.rate_limit_chat)
-    async def send(
-        self,
-        request: Request,
-        payload: ChatRequest,
-        user: CurrentUser,
-        service: ChatServiceDep,
-    ) -> ChatResponse:
-        del request, user
-        return await service.reply(payload.messages)
+@router.post("", response_model=ChatResponse)
+@limiter.limit(settings.rate_limit_chat)
+async def send_chat(
+    request: Request,
+    payload: ChatRequest,
+    user: CurrentUser,
+    service: ChatServiceDep,
+) -> ChatResponse:
+    del request, user
+    return await service.reply(payload.messages)
