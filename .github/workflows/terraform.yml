@@ -1,0 +1,128 @@
+name: terraform
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Terraform action to run"
+        type: choice
+        required: true
+        default: plan
+        options:
+          - plan
+          - apply
+          - destroy
+      environment:
+        description: "Target environment"
+        type: choice
+        required: true
+        default: dev
+        options:
+          - dev
+      destroy_confirmation:
+        description: "Type DESTROY (uppercase) to confirm — required for the destroy action"
+        type: string
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: terraform-${{ inputs.environment }}
+  cancel-in-progress: false
+
+jobs:
+  terraform:
+    name: terraform-${{ inputs.action }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    defaults:
+      run:
+        working-directory: infra/envs/${{ inputs.environment }}
+    env:
+      TF_IN_AUTOMATION: "1"
+      TF_INPUT: "0"
+      TF_VAR_project_id: ${{ vars.GCP_PROJECT_ID }}
+      TF_VAR_region: ${{ vars.GCP_REGION }}
+      TF_VAR_environment: ${{ inputs.environment }}
+      TF_VAR_owner: ${{ vars.OWNER }}
+      TF_VAR_backend_image: ${{ vars.BACKEND_IMAGE }}
+      TF_VAR_frontend_image: ${{ vars.FRONTEND_IMAGE }}
+      TF_VAR_openrouter_api_key: ${{ secrets.OPENROUTER_API_KEY }}
+      TF_VAR_openrouter_model: ${{ vars.OPENROUTER_MODEL }}
+      TF_VAR_mcp_server_url: ${{ vars.MCP_SERVER_URL }}
+      TF_VAR_clerk_issuer: ${{ vars.CLERK_ISSUER }}
+      TF_VAR_clerk_jwks_url: ${{ vars.CLERK_JWKS_URL }}
+      TF_VAR_clerk_publishable_key: ${{ vars.CLERK_PUBLISHABLE_KEY }}
+      TF_VAR_cors_origins: ${{ vars.CORS_ORIGINS }}
+
+    steps:
+      - name: Guard destroy
+        if: inputs.action == 'destroy' && inputs.destroy_confirmation != 'DESTROY'
+        run: |
+          echo "Destroy requires destroy_confirmation=DESTROY. Aborting."
+          exit 1
+
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - name: Authenticate to Google Cloud (WIF)
+        uses: google-github-actions/auth@71f986410dfbc7added4569d411d040a91dc6935 # v2.1.5
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SA }}
+
+      - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
+        with:
+          terraform_version: "1.9.8"
+          terraform_wrapper: false
+
+      - name: terraform fmt
+        run: terraform fmt -check -recursive ../../
+
+      - name: terraform init
+        run: terraform init -input=false
+
+      - name: terraform validate
+        run: terraform validate -no-color
+
+      - name: terraform plan
+        if: inputs.action == 'plan' || inputs.action == 'apply'
+        run: |
+          set -o pipefail
+          terraform plan -input=false -no-color -out=tfplan | tee plan.txt
+          {
+            echo "## Terraform plan (${{ inputs.environment }})"
+            echo ""
+            echo '```'
+            tail -c 60000 plan.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload plan artifact
+        if: inputs.action == 'plan' || inputs.action == 'apply'
+        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+        with:
+          name: tfplan-${{ inputs.environment }}-${{ github.run_id }}
+          path: infra/envs/${{ inputs.environment }}/tfplan
+          retention-days: 14
+
+      - name: terraform apply
+        if: inputs.action == 'apply'
+        run: terraform apply -input=false -no-color tfplan
+
+      - name: terraform destroy
+        if: inputs.action == 'destroy'
+        run: terraform destroy -input=false -no-color -auto-approve
+
+      - name: Capture outputs
+        if: inputs.action == 'apply'
+        run: |
+          {
+            echo "## Outputs"
+            echo ""
+            echo '```'
+            terraform output -no-color
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

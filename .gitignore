@@ -21,6 +21,8 @@ htmlcov/
 .terraform/
 *.tfstate
 *.tfstate.backup
+tfplan
+*.tfplan
 *.tfvars
 !*.tfvars.example
 crash.log
