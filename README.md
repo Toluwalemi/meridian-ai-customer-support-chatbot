@@ -1,6 +1,19 @@
 # Meridian AI Customer Support Chatbot
 
+> ## Live demo
+> ### **[https://meridian-frontend-dev-zib44qu2wq-ew.a.run.app](https://meridian-frontend-dev-zib44qu2wq-ew.a.run.app)**
+>
+> Backend API: `https://meridian-backend-dev-zib44qu2wq-ew.a.run.app`
+> Region: `europe-west1` · Both services on Cloud Run, scale-to-zero (~2 s cold start).
+
 LLM-powered customer-support chatbot for Meridian Electronics. The frontend signs the customer in with Clerk and chats with a FastAPI backend that proxies to Meridian's MCP server. The model, accessed through OpenRouter, discovers the MCP tools at startup and calls them inside a bounded tool-use loop to handle product browsing, customer verification, order history, and order placement.
+
+## Try it
+
+1. Open the frontend URL above.
+2. Sign in with Clerk (any email; verification by code).
+3. Use a test customer from `backend/tests/fixtures/test_customers.md` — for example `donaldgarcia@example.net` / PIN `7912`.
+4. Walk a scenario from `backend/tests/fixtures/demo_prompts.md` — anonymous browse, authenticated order history, or a `CONFIRM`-gated order placement.
 
 ## Stack
 
@@ -95,3 +108,4 @@ Sign in with Clerk, then chat. The bot will ask you to verify with email + 4-dig
 cd backend && pytest -q
 cd frontend && npm test
 ``
+docker buildx build --platform linux/amd64 -t europe-west1-docker.pkg.dev/andela-meridian-prod/meridian-ai-customer-support-chatbot backend:v1 backend --load

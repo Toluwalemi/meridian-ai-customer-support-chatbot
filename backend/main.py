@@ -46,8 +46,8 @@ def create_app() -> FastAPI:
 
     register_exception_handlers(app)
 
-    @app.get("/healthz", tags=["meta"])
-    async def healthz() -> dict[str, str]:
+    @app.get("/health", tags=["meta"])
+    async def health() -> dict[str, str]:
         return {"status": "ok", "env": settings.env}
 
     app.include_router(chat_router, prefix="/api/v1")

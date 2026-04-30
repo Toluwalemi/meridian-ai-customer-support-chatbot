@@ -14,9 +14,10 @@ resource "google_secret_manager_secret_iam_member" "accessor" {
 }
 
 resource "google_cloud_run_v2_service" "this" {
-  project  = var.project_id
-  location = var.region
-  name     = var.service_name
+  project             = var.project_id
+  location            = var.region
+  name                = var.service_name
+  deletion_protection = var.deletion_protection
 
   template {
     service_account = google_service_account.runtime.email

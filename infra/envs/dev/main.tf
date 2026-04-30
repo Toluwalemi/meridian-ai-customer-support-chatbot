@@ -48,3 +48,11 @@ module "backend" {
     OPENROUTER_API_KEY = module.secrets.secret_ids["openrouter-api-key"]
   }
 }
+
+module "frontend" {
+  source       = "../../modules/cloud_run_service"
+  project_id   = var.project_id
+  region       = var.region
+  service_name = "meridian-frontend-${var.environment}"
+  image        = var.frontend_image
+}

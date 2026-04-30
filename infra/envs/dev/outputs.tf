@@ -3,7 +3,12 @@ output "backend_url" {
   description = "Public URL of the backend Cloud Run service."
 }
 
+output "frontend_url" {
+  value       = module.frontend.service_url
+  description = "Public URL of the frontend Cloud Run service."
+}
+
 output "artifact_registry_repository" {
   value       = module.artifact_registry.repository_url
-  description = "Docker repository URL for backend images."
+  description = "Docker repository URL for backend and frontend images."
 }

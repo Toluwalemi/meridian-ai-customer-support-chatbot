@@ -36,6 +36,16 @@ variable "backend_image" {
   description = "Fully-qualified Artifact Registry image for the backend, e.g. us-central1-docker.pkg.dev/PROJECT/meridian/backend:GIT_SHA"
 }
 
+variable "frontend_image" {
+  type        = string
+  description = "Fully-qualified Artifact Registry image for the frontend (nginx-served React build)."
+}
+
+variable "clerk_publishable_key" {
+  type        = string
+  description = "Clerk publishable key (pk_test_... or pk_live_...). Public; baked into the frontend bundle at build time."
+}
+
 variable "openrouter_api_key" {
   type      = string
   sensitive = true
