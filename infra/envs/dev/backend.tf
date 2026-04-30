@@ -1,6 +1,6 @@
 terraform {
   backend "gcs" {
-    bucket = "meridian-tfstate-dev"
+    bucket = "andela-meridian-prod-tfstate"
     prefix = "envs/dev"
   }
 }

@@ -21,7 +21,7 @@ module "secrets" {
   source     = "../../modules/secrets"
   project_id = var.project_id
   secrets = {
-    anthropic-api-key = var.anthropic_api_key
+    openrouter-api-key = var.openrouter_api_key
   }
 }
 
@@ -33,16 +33,18 @@ module "backend" {
   image        = var.backend_image
 
   env = {
-    APP_NAME       = "meridian-support-chatbot"
-    ENV            = var.environment
-    DEBUG          = "false"
-    MCP_SERVER_URL = var.mcp_server_url
-    CLERK_ISSUER   = var.clerk_issuer
-    CLERK_JWKS_URL = var.clerk_jwks_url
-    CORS_ORIGINS   = join(",", var.cors_origins)
+    APP_NAME          = "meridian-support-chatbot"
+    ENV               = var.environment
+    DEBUG             = "false"
+    OPENROUTER_MODEL  = var.openrouter_model
+    MCP_SERVER_URL    = var.mcp_server_url
+    CLERK_ISSUER      = var.clerk_issuer
+    CLERK_JWKS_URL    = var.clerk_jwks_url
+    CORS_ORIGINS      = join(",", var.cors_origins)
+    AUTH_DEV_BYPASS   = "false"
   }
 
   secret_env = {
-    ANTHROPIC_API_KEY = module.secrets.secret_ids["anthropic-api-key"]
+    OPENROUTER_API_KEY = module.secrets.secret_ids["openrouter-api-key"]
   }
 }

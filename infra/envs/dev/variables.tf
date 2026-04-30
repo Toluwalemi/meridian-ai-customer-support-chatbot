@@ -36,9 +36,14 @@ variable "backend_image" {
   description = "Fully-qualified Artifact Registry image for the backend, e.g. us-central1-docker.pkg.dev/PROJECT/meridian/backend:GIT_SHA"
 }
 
-variable "anthropic_api_key" {
+variable "openrouter_api_key" {
   type      = string
   sensitive = true
+}
+
+variable "openrouter_model" {
+  type    = string
+  default = "anthropic/claude-3.5-haiku"
 }
 
 variable "mcp_server_url" {
