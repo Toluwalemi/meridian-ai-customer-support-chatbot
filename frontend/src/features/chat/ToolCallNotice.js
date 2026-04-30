@@ -1,0 +1,4 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+export function ToolCallNotice({ call }) {
+    return (_jsxs("details", { className: "rounded border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600", children: [_jsxs("summary", { className: "cursor-pointer select-none font-medium text-slate-700", children: ["Called ", _jsx("span", { className: "font-mono text-slate-900", children: call.name })] }), _jsxs("div", { className: "mt-2 space-y-1", children: [_jsxs("div", { children: [_jsx("span", { className: "font-medium text-slate-700", children: "Arguments: " }), _jsx("span", { className: "font-mono", children: JSON.stringify(call.arguments) })] }), _jsxs("div", { children: [_jsx("span", { className: "font-medium text-slate-700", children: "Result: " }), _jsx("pre", { className: "mt-1 whitespace-pre-wrap break-words font-mono text-[11px] text-slate-700", children: call.result_preview })] })] })] }));
+}

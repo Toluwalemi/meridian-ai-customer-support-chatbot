@@ -1,0 +1,8 @@
+project_id      = "meridian-dev"
+region          = "us-central1"
+environment     = "dev"
+owner           = "platform"
+backend_image   = "us-central1-docker.pkg.dev/meridian-dev/meridian/backend:latest"
+clerk_issuer    = "https://your-app.clerk.accounts.dev"
+clerk_jwks_url  = "https://your-app.clerk.accounts.dev/.well-known/jwks.json"
+cors_origins    = ["http://localhost:5173"]

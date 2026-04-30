@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/features/chat/chatpage.tsx","./src/features/chat/composer.tsx","./src/features/chat/messagebubble.tsx","./src/features/chat/toolcallnotice.tsx","./src/features/chat/types.ts","./src/features/chat/usechat.ts","./src/lib/api.ts","./src/lib/env.ts"],"version":"5.7.2"}
