@@ -1,7 +1,7 @@
 # Meridian AI Customer Support Chatbot
 
 > ## Live demo
-> ### **[https://meridian-frontend-dev-zib44qu2wq-ew.a.run.app](https://meridian-frontend-dev-zib44qu2wq-ew.a.run.app)**
+> ### **[[https://meridian-frontend-dev-zib44qu2wq-ew.a.run.app](https://meridian-frontend-dev-zib44qu2wq-ew.a.run.app/)]**
 >
 > Backend API: `https://meridian-backend-dev-zib44qu2wq-ew.a.run.app`
 > Region: `europe-west1` · Both services on Cloud Run, scale-to-zero (~2 s cold start).
